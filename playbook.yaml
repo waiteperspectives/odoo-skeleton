@@ -1,0 +1,64 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    pg_auth:
+      user: odoo
+      password: odoo
+    odoo_dependencies:
+      - python3
+      - python3-pip
+      - python-virtualenv
+      - wget
+      - git
+      - unzip
+      - libpq-dev
+      - libldap2-dev
+      - libsasl2-dev
+      - libxml2-dev
+      - libevent-dev
+      - libxslt1-dev
+
+  tasks:
+    - name: Update Server
+      apt:
+        update_cache: yes
+
+    - name: Ensure group exists for system user
+      group:
+        name: "odoo"
+        state: present
+    - name: Create System User
+      user:
+        name: "odoo"
+        shell: /bin/bash
+        group: "odoo"
+        state: present
+    - name: Install System Dependencies
+      apt:
+        name: "{{ odoo_dependencies }}"
+
+    - name: Install postgresql-contrib
+      apt: 
+        update_cache: yes
+        state: present
+        name: postgresql
+    - name: Install psycopg2
+      apt: 
+        update_cache: yes
+        state: present
+        name: python3-psycopg2
+    - name: Install postgresql
+      apt: 
+        update_cache: yes
+        state: present
+        name: postgresql
+    - name: Add postgres user
+      become: yes
+      become_user: postgres
+      postgresql_user:
+        name: "{{ pg_auth['user'] }}"
+        password: "{{ pg_auth['password'] }}"
+        role_attr_flags: "CREATEDB,SUPERUSER"
