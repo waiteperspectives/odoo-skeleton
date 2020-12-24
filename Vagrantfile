@@ -1,5 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+#
 
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/bionic64"
@@ -12,10 +13,22 @@ Vagrant.configure("2") do |config|
     vb.name = "tmp-odoo"
   end
 
-  # Set the timezone to the host timezone
   config.vm.provision :shell, :inline => "sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/America/New_York /etc/localtime", run: "always"
 
+  #config.vm.provision "ansible" do |ansible|
+  #  ansible.playbook = "provisioning/playbooks/setup_postgres.yaml"
+  #end
+
+  #config.vm.provision "ansible" do |ansible|
+  #  ansible.playbook = "provisioning/playbooks/setup_odoo.yaml"
+  #end
+
+  #config.vm.provision "ansible" do |ansible|
+  #  ansible.playbook = "provisioning/playbooks/setup_node.yaml"
+  #end
+
   config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "playbook.yaml"
+    ansible.playbook = "provisioning/playbooks/setup_vim.yaml"
   end
+
 end

@@ -2,6 +2,7 @@
 
 This repository supplies a setup for Odoo development using Ubuntu on Virtualbox VM provisioned by Vagrant.
 
+
 # Getting Started
 
 - Clone the repo

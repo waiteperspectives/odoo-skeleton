@@ -1,0 +1,29 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    odoo_dependencies:
+      - python3
+      - python3-pip
+      - python3-virtualenv
+      - wget
+      - git
+      - unzip
+      - libpq-dev
+      - libldap2-dev
+      - libsasl2-dev
+      - libxml2-dev
+      - libevent-dev
+      - libxslt1-dev
+
+  tasks:
+    - name: Update Server
+      apt:
+        update_cache: yes
+
+    - name: Install System Dependencies
+      apt:
+        name: "{{ odoo_dependencies }}"
+

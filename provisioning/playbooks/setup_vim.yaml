@@ -1,0 +1,68 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: remove vim
+      apt:
+        name: vim
+        state: absent
+
+    - name: add jonathans vim
+      apt_repository:
+        repo: ppa:jonathonf/vim
+
+    - name: add packages
+      apt:
+        pkg:
+          - make
+          - zip
+          - unzip
+          - apt-transport-https
+          - vim
+
+    - name: Update server
+      apt:
+        update_cache: yes
+
+    - name: get vim plug
+      shell: curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+      become: yes
+      become_user: vagrant
+      args:
+        executable: /bin/bash
+
+    - name: copy vimrc
+      copy:
+        src: ../templates/vimrc
+        dest: "/home/vagrant/.vimrc"
+        owner: "vagrant"
+        group: "vagrant"
+
+    # TODO: install plugins
+    # - name: install black
+    #   pip:
+    #     name: black
+
+    # - name: install vim plugins
+    #   shell: vim -E -s +"source /home/vagrant/.vimrc" +PlugInstall +qall
+    #   become: yes
+    #   become_user: vagrant
+    #   ignore_errors: yes # ignore_errors required here, despite success
+
+    # - name: install coc extensions
+    #   shell: vim -E -s +"source /home/vagrant/.vimrc" +"CocInstall -sync coc-json coc-tsserver coc-pyright coc-yaml coc-snippets coc-prettier" +qall
+    #   become: yes
+    #   become_user: vagrant
+    #   ignore_errors: yes # ignore_errors required here, despite success
+
+    # - name: run coc updater
+    #   shell: vim -E -s +"source /home/vagrant/.vimrc" +"CocUpdateSync" +qall
+    #   become: yes
+    #   become_user: vagrant
+    #   ignore_errors: yes # ignore_errors required here, despite success
+
+
+

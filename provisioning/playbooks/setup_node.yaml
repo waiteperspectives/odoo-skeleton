@@ -1,0 +1,11 @@
+---
+- hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: Run nvm installer
+      script: ../scripts/install_nvm.sh
+    - name: install latest node as vagrant
+      shell: source ~/.nvm/nvm.sh && nvm install node
+      args:
+        executable: /bin/bash

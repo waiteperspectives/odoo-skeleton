@@ -1,0 +1,41 @@
+" Specify a directory for plugins
+" - For Neovim: stdpath('data') . '/plugged'
+" - Avoid using standard Vim directory names like 'plugin'
+call plug#begin('~/.vim/plugged')
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'sukima/xmledit', {'branch': 'master'}
+call plug#end()
+
+imap jk <ESC>
+" use <tab> for trigger completion and navigate to the next complete item
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~ '\s'
+endfunction
+
+inoremap <silent><expr> <Tab>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<Tab>" :
+      \ coc#refresh()
+
+imap ~i from odoo import models, fields, api, _ <CR><CR><CR>
+imap ~p import pdb; pdb.set_trace()
+imap ~l import logging; _logger = logging.getLogger(__name__)
+imap ~t from hamcrest import *  # pylint: disable=unused-wildcard-import<CR>from odoo.tests.common import TransactionCase
+
+set colorcolumn=88
+set hlsearch
+set nowrap
+set nu
+
+" need these for xml, yaml
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
+set textwidth=0
+set nowrap
+set expandtab
+set autoindent
+set fileformat=unix
+
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
