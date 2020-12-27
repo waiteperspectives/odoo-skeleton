@@ -1,0 +1,7 @@
+{
+  "python.pythonPath": "/usr/local/bin/python3",
+  "yaml.format.enable": true,
+  "python.formatting.provider": "black",
+  "python.formatting.blackPath": "/usr/local/bin/black",
+  "coc.preferences.formatOnSaveFiletypes": ["python", "json", "javascript", "css", "markdown"]
+}

@@ -1,0 +1,10 @@
+{
+  "venvPath": "/home/vagrant/PROJECT",
+  "executionEnvironments": [
+    {
+      "root": "odoo",
+      "extraPaths": ["odoo/odoo"],
+      "venv": "venv"
+    }
+  ]
+}

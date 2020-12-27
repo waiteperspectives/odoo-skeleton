@@ -15,20 +15,21 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision :shell, :inline => "sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/America/New_York /etc/localtime", run: "always"
 
-  #config.vm.provision "ansible" do |ansible|
-  #  ansible.playbook = "provisioning/playbooks/setup_postgres.yaml"
-  #end
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "provisioning/playbooks/setup_postgres.yaml"
+  end
 
-  #config.vm.provision "ansible" do |ansible|
-  #  ansible.playbook = "provisioning/playbooks/setup_odoo.yaml"
-  #end
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "provisioning/playbooks/setup_odoo.yaml"
+  end
 
-  #config.vm.provision "ansible" do |ansible|
-  #  ansible.playbook = "provisioning/playbooks/setup_node.yaml"
-  #end
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "provisioning/playbooks/setup_node.yaml"
+  end
 
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "provisioning/playbooks/setup_vim.yaml"
+    # ansible.raw_arguments = ['-v']
   end
 
 end

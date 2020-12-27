@@ -1,13 +1,25 @@
+# assumes setup_node.yaml has already run
 ---
 - hosts: all
   become: yes
   become_user: root
   vars:
     ansible_python_interpreter: /usr/bin/python3
+    coc_extensions: coc-json coc-snippets coc-tsserver coc-prettier coc-yaml coc-pyright
   tasks:
     - name: remove vim
       apt:
         name: vim
+        state: absent
+
+    - name: remove vim plugins
+      file:
+        path: /home/vagrant/.vim
+        state: absent
+
+    - name: remove old coc config
+      file:
+        path: /home/vagrant/.config/coc
         state: absent
 
     - name: add jonathans vim
@@ -22,6 +34,7 @@
           - unzip
           - apt-transport-https
           - vim
+          - python3-pip
 
     - name: Update server
       apt:
@@ -41,28 +54,78 @@
         owner: "vagrant"
         group: "vagrant"
 
-    # TODO: install plugins
-    # - name: install black
-    #   pip:
-    #     name: black
+    - name: install vim plugins
+      shell: vim +'PlugInstall --sync' +qall &> /dev/null < /dev/tty
+      become: yes
+      become_user: vagrant
+      args:
+        executable: /bin/bash
 
-    # - name: install vim plugins
-    #   shell: vim -E -s +"source /home/vagrant/.vimrc" +PlugInstall +qall
-    #   become: yes
-    #   become_user: vagrant
-    #   ignore_errors: yes # ignore_errors required here, despite success
+    - name: install black
+      pip:
+        name: black
+        executable: pip3
+      become: yes
+      become_user: vagrant
 
-    # - name: install coc extensions
-    #   shell: vim -E -s +"source /home/vagrant/.vimrc" +"CocInstall -sync coc-json coc-tsserver coc-pyright coc-yaml coc-snippets coc-prettier" +qall
-    #   become: yes
-    #   become_user: vagrant
-    #   ignore_errors: yes # ignore_errors required here, despite success
+    - name: make coc extensions folder
+      file:
+        path: /home/vagrant/.config/coc/extensions
+        state: directory
+        mode: '0755'
+        owner: vagrant
+        group: vagrant
 
-    # - name: run coc updater
-    #   shell: vim -E -s +"source /home/vagrant/.vimrc" +"CocUpdateSync" +qall
-    #   become: yes
-    #   become_user: vagrant
-    #   ignore_errors: yes # ignore_errors required here, despite success
+    - name: remove package.json
+      file:
+        path: /home/vagrant/.config/coc/extensions/package.json
+        state: absent
 
+    - name: add package.json
+      file:
+        path: /home/vagrant/.config/coc/extensions/package.json
+        state: touch
+        owner: vagrant
+        group: vagrant
 
+    - name: add deps line to package.json
+      lineinfile:
+        path: /home/vagrant/.config/coc/extensions/package.json
+        line: '{ "dependencies": {} }'
+        create: yes
+
+    - name: install coc extensions
+      shell: "source ~/.nvm/nvm.sh && npm install {{ coc_extensions }} --global-style --ignore-scripts --no-bin-links --no-package-lock --only=prod"
+      become: yes
+      become_user: vagrant
+      args:
+        executable: /bin/bash
+        chdir: /home/vagrant/.config/coc/extensions
+
+    - name: copy coc-settings.json
+      copy:
+        src: ../templates/coc-settings.json
+        dest: "/home/vagrant/.config/coc/coc-settings.json"
+        owner: vagrant
+        group: vagrant
+
+    - name: copy pyrightconfig.json
+      copy:
+        src: ../templates/pyrightconfig.json
+        dest: "/home/vagrant/TEMPLATE-pyrightconfig.json"
+        owner: vagrant
+        group: vagrant
+
+    - name: make snippets dir
+      file:
+        path: /home/vagrant/.config/coc/ultisnips
+        state: directory
+        mode: "0755"
+
+    - name: add python snippets
+      copy:
+        src: ../templates/python.snippets
+        dest: "/home/vagrant/.config/coc/ultisnips/python.snippets"
+        owner: vagrant
+        group: vagrant
 
