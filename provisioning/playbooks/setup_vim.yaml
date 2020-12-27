@@ -105,7 +105,7 @@
     - name: copy coc-settings.json
       copy:
         src: ../templates/coc-settings.json
-        dest: "/home/vagrant/.config/coc/coc-settings.json"
+        dest: "/home/vagrant/.vim/coc-settings.json"
         owner: vagrant
         group: vagrant
 
@@ -126,6 +126,20 @@
       copy:
         src: ../templates/python.snippets
         dest: "/home/vagrant/.config/coc/ultisnips/python.snippets"
+        owner: vagrant
+        group: vagrant
+
+    - name: add xml snippets
+      copy:
+        src: ../templates/xml.snippets
+        dest: "/home/vagrant/.config/coc/ultisnips/xml.snippets"
+        owner: vagrant
+        group: vagrant
+
+    - name: add yaml snippets
+      copy:
+        src: ../templates/yaml.snippets
+        dest: "/home/vagrant/.config/coc/ultisnips/yaml.snippets"
         owner: vagrant
         group: vagrant
 
