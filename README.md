@@ -17,7 +17,7 @@ customer to customer.
 # Example
 
 ```bash
-git clone waiteperspectives@vs-ssh.visualstudio.com:v3/waiteperspectives/Waite-Perspectives/odoo-skeleton tmp-odoo
+git clone https://github.com/waiteperspectives/odoo-skeleton tmp-odoo
 cd tmp-odoo
 rm -rf .git
 ./venv-install-ansible.sh
