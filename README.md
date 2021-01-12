@@ -11,6 +11,7 @@ customer to customer.
 - Remove the git artifacts
 - Edit the config
 - install ansible into venv if not globally installed (venv-install-ansible.sh)
+- ```source venv/bin/activate```
 - Run `vagrant up`
 
 # Example
