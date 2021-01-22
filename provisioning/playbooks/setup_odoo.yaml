@@ -17,6 +17,8 @@
       - libxml2-dev
       - libevent-dev
       - libxslt1-dev
+      - libjpeg-dev
+      - zlib1g-dev
 
   tasks:
     - name: Update Server
