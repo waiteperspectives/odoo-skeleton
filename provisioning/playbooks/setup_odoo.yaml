@@ -1,7 +1,5 @@
 ---
 - hosts: all
-  become: yes
-  become_user: root
   vars:
     ansible_python_interpreter: /usr/bin/python3
     odoo_dependencies:
@@ -19,13 +17,42 @@
       - libxslt1-dev
       - libjpeg-dev
       - zlib1g-dev
+      - make
+      - build-essential
+      - libssl-dev
+      - libbz2-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - llvm
+      - libncurses5-dev
+      - xz-utils
+      - tk-dev
+      - libffi-dev
+      - liblzma-dev
+      - python-openssl
 
   tasks:
     - name: Update Server
+      become: yes
+      become_user: root
       apt:
         update_cache: yes
 
     - name: Install System Dependencies
+      become: yes
+      become_user: root
       apt:
         name: "{{ odoo_dependencies }}"
+
+    - name: Check for .pyenv
+      stat:
+        path: /home/vagrant/.pyenv
+      register: pyenv_root
+
+    - name: Install pyenv
+      shell: 
+        cmd: curl https://pyenv.run | bash
+        executable: /bin/bash
+        warn: false
+      when: pyenv_root.stat.exists == False
 

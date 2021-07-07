@@ -29,7 +29,6 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "provisioning/playbooks/setup_vim.yaml"
-    # ansible.raw_arguments = ['-v']
   end
 
 end
