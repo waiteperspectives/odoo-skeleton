@@ -19,6 +19,8 @@ or [PyCharm](https://www.jetbrains.com/pycharm/) with a few extra steps.
 - Python versions or virtualenvs (use `pyenv` to manage project specific pythons)
 - Odoo source code (use `git` to manage project specific source code)
 - Odoo config file (use `odoo-bin` with `--save` option to bootstrap a config)
+- Mailhog (download [here](https://github.com/mailhog/MailHog/releases/v1.0.0) with `wget`)
+- Wkhtmltopdf (download [here](https://wkhtmltopdf.org/) if needed)
 
 
 # Dependencies
