@@ -109,13 +109,6 @@
         owner: vagrant
         group: vagrant
 
-    - name: copy pyrightconfig.json
-      copy:
-        src: ../templates/pyrightconfig.json
-        dest: "/home/vagrant/TEMPLATE-pyrightconfig.json"
-        owner: vagrant
-        group: vagrant
-
     - name: make snippets dir
       file:
         path: /home/vagrant/.config/coc/ultisnips

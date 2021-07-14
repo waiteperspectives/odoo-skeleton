@@ -7,6 +7,7 @@
     pg_auth:
       user: vagrant
       password: vagrant
+    postgresql_version: 10
   tasks:
     - name: Install postgresql-contrib
       apt: 
@@ -31,3 +32,17 @@
         password: "{{ pg_auth['password'] }}"
         role_attr_flags: "CREATEDB,SUPERUSER"
 
+    - name: Set listen_addresses
+      lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
+        regexp="listen_addresses =" line="listen_addresses = '*'" state=present
+
+    - name: Trust local connections
+      lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
+        regexp="host\s+all\s+all\s+127.0.0.1/32"
+        line="host    all             all             0.0.0.0/0               trust"
+        state=present
+      notify: restart postgres
+
+  handlers:
+    - name: restart postgres
+      service: name=postgresql state=restarted

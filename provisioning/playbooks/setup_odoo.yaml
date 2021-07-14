@@ -56,3 +56,33 @@
         warn: false
       when: pyenv_root.stat.exists == False
 
+    - name: Check for pyenv pyright
+      stat:
+        path: /home/vagrant/.pyenv/plugins/pyenv-pyright
+      register: pyenv_pyright_root
+
+    - name: Install pyenv pyright
+      shell:
+        cmd: git clone https://github.com/alefpereira/pyenv-pyright.git /home/vagrant/.pyenv/plugins/pyenv-pyright
+        executable: /bin/bash
+        warn: false
+      when: pyenv_pyright_root.stat.exists == False
+
+    - name: Copy pyenv_init
+      copy:
+        src: ../templates/pyenv_init.txt
+        dest: "/home/vagrant/.pyenv/pyenv_init.txt"
+        owner: "vagrant"
+        group: "vagrant"
+
+    - name: Add pyenv_init to bashrc
+      lineinfile: dest=/home/vagrant/.bashrc
+        regexp="source /home/vagrant/.pyenv/pyenv_init.txt"
+        line="source /home/vagrant/.pyenv/pyenv_init.txt"
+        state=present
+
+    - name: Add prompt manager to bashrc
+      lineinfile: dest=/home/vagrant/.bashrc
+        regexp="export PS1='($(pyenv version-name)) '$PS1"
+        line="export PS1='($(pyenv version-name)) '$PS1"
+        state=present
