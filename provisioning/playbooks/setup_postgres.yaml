@@ -7,7 +7,7 @@
     pg_auth:
       user: vagrant
       password: vagrant
-    postgresql_version: 10
+    postgresql_version: 12
   tasks:
     - name: Install postgresql-contrib
       apt: 
