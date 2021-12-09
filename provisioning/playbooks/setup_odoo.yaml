@@ -2,87 +2,73 @@
 - hosts: all
   vars:
     ansible_python_interpreter: /usr/bin/python3
-    odoo_dependencies:
-      - python3
-      - python3-pip
-      - python3-virtualenv
-      - wget
-      - git
-      - unzip
-      - libpq-dev
-      - libldap2-dev
-      - libsasl2-dev
-      - libxml2-dev
-      - libevent-dev
-      - libxslt1-dev
-      - libjpeg-dev
-      - zlib1g-dev
-      - make
-      - build-essential
-      - libssl-dev
-      - libbz2-dev
-      - libreadline-dev
-      - libsqlite3-dev
-      - llvm
-      - libncurses5-dev
-      - xz-utils
-      - tk-dev
-      - libffi-dev
-      - liblzma-dev
-      - python-openssl
-
+    odoo_user: odoo
+    odoo_port: 8069
+    odoo_longpolling: 8072
+    odoo_version: 14.0
+    odoo_db: odoo8069
+    python_version: 3.8.5
+    pyenv_bin: "/home/{{ odoo_user }}/.pyenv/bin/pyenv"
+  become: yes
+  become_user: odoo
   tasks:
-    - name: Update Server
+    - name: Ensure odoo config dir
+      ansible.builtin.file:
+        path: "/home/{{ odoo_user }}/config"
+        owner: "{{ odoo_user }}"
+        group: "{{ odoo_user }}"
+        state: directory
+    - name: Create odoo config file
+      ansible.builtin.template:
+        src: ../templates/odoo.conf.j2
+        dest: "/home/{{ odoo_user }}/config/odoo.conf"
+    - name: Ensure logs dir
+      ansible.builtin.file:
+        path: "/home/{{ odoo_user }}/logs"
+        owner: "{{ odoo_user }}"
+        group: "{{ odoo_user }}"
+        state: directory
+    - name: Prepare odoo log
+      ansible.builtin.file:
+        path: "/home/{{ odoo_user }}/logs/odoo.log"
+        owner: "{{ odoo_user }}"
+        group: "{{ odoo_user }}"
+        state: touch
+    - name: Ensure odoo filestore dir
+      ansible.builtin.file:
+        path: "/home/{{ odoo_user }}/filestore"
+        owner: "{{ odoo_user }}"
+        group: "{{ odoo_user }}"
+        state: directory
+    - name: Git ensure odoo src
+      ansible.builtin.git:
+        repo: https://github.com/odoo/odoo.git
+        dest: "/home/{{ odoo_user }}/odoo"
+        version: "{{ odoo_version }}"
+    - name: Check for python version
+      ansible.builtin.shell: "{{ pyenv_bin }} versions | grep {{ python_version }} | wc -l"
+      register: version_count
+    - name: Install python version if needed
+      ansible.builtin.shell: "{{ pyenv_bin }} install {{ python_version }}"
+      when: version_count.stdout == "0"
+    - name: Check for virtual env
+      ansible.builtin.shell: "{{ pyenv_bin }} versions | grep {{ python_version }}/envs/odoo | wc -l"
+      register: odoo_virtualenv_count
+    - name: Create virtual environment if needed
+      ansible.builtin.shell: "{{ pyenv_bin }} virtualenv {{ python_version }} odoo"
+      when: odoo_virtualenv_count.stdout == "0"
+    - name: Make virtualenv the pyenv global default
+      ansible.builtin.shell: "{{ pyenv_bin }} global odoo"
+    - name: Define odoo as a service without running
       become: yes
       become_user: root
-      apt:
-        update_cache: yes
-
-    - name: Install System Dependencies
+      ansible.builtin.template:
+        src: "../templates/odoo.service.j2"
+        dest: "/etc/systemd/system/odoo8069.service"
+    - name: Prepare log rotation
       become: yes
       become_user: root
-      apt:
-        name: "{{ odoo_dependencies }}"
+      ansible.builtin.template:
+        src: "../templates/logrotate.j2"
+        dest: "/etc/logrotate.d/odoo"
 
-    - name: Check for .pyenv
-      stat:
-        path: /home/vagrant/.pyenv
-      register: pyenv_root
-
-    - name: Install pyenv
-      shell: 
-        cmd: curl https://pyenv.run | bash
-        executable: /bin/bash
-        warn: false
-      when: pyenv_root.stat.exists == False
-
-    - name: Check for pyenv pyright
-      stat:
-        path: /home/vagrant/.pyenv/plugins/pyenv-pyright
-      register: pyenv_pyright_root
-
-    - name: Install pyenv pyright
-      shell:
-        cmd: git clone https://github.com/alefpereira/pyenv-pyright.git /home/vagrant/.pyenv/plugins/pyenv-pyright
-        executable: /bin/bash
-        warn: false
-      when: pyenv_pyright_root.stat.exists == False
-
-    - name: Copy pyenv_init
-      copy:
-        src: ../templates/pyenv_init.txt
-        dest: "/home/vagrant/.pyenv/pyenv_init.txt"
-        owner: "vagrant"
-        group: "vagrant"
-
-    - name: Add pyenv_init to bashrc
-      lineinfile: dest=/home/vagrant/.bashrc
-        regexp="source /home/vagrant/.pyenv/pyenv_init.txt"
-        line="source /home/vagrant/.pyenv/pyenv_init.txt"
-        state=present
-
-    - name: Add prompt manager to bashrc
-      lineinfile: dest=/home/vagrant/.bashrc
-        regexp="export PS1='($(pyenv version-name)) '$PS1"
-        line="export PS1='($(pyenv version-name)) '$PS1"
-        state=present

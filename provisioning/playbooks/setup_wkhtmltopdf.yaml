@@ -1,0 +1,33 @@
+---
+- hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    dependencies:
+      - libpng-dev
+      - xfonts-base
+      - xfonts-encodings
+      - xfonts-utils
+      - xfonts-75dpi
+      - fontconfig
+  become: yes
+  become_user: root
+  tasks:
+    - name: Update Server
+      become: yes
+      become_user: root
+      apt:
+        update_cache: yes
+    - name: Install System Dependencies
+      become: yes
+      become_user: root
+      apt:
+        name: "{{ dependencies }}"
+    - name: Download wkhtmltodpf
+      command: wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.focal_amd64.deb
+    - name: Try install wkhtmltopdf, ignoring errors
+      command:  dpkg -i wkhtmltox_0.12.5-1.focal_amd64.deb
+      ignore_errors: yes
+    - name: Force install deps
+      apt:
+        update_cache: true
+        force_apt_get: true

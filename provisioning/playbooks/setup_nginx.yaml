@@ -1,0 +1,46 @@
+---
+- hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    odoo_user: odoo
+    nginx_server_name: odoo.waiteperspectives.com
+  become: yes
+  become_user: root
+  tasks:
+    - name: Ensure logs directory
+      ansible.builtin.file:
+        path: "/home/{{ odoo_user }}/logs"
+        owner: "{{ odoo_user }}"
+        group: "{{ odoo_user }}"
+        state: directory
+    - name: Prepare access log
+      ansible.builtin.file:
+        path: "/home/{{ odoo_user }}/logs/nginx.access.log"
+        owner: "{{ odoo_user }}"
+        group: "{{ odoo_user }}"
+        state: touch
+    - name: Prepare error log
+      ansible.builtin.file:
+        path: "/home/{{ odoo_user }}/logs/nginx.error.log"
+        owner: "{{ odoo_user }}"
+        group: "{{ odoo_user }}"
+        state: touch
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+    - name: Copy config
+      ansible.builtin.template:
+        src: ../templates/nginx.conf.j2
+        dest: "/etc/nginx/sites-available/odoo8069.conf"
+    - name: Enable Odoo reverse proxy
+      file:
+        src: "/etc/nginx/sites-available/odoo8069.conf"
+        dest: "/etc/nginx/sites-enabled/odoo8069.conf"
+        state: link
+      notify: restart nginx
+
+
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted

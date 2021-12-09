@@ -1,0 +1,8 @@
+---
+- import_playbook: provisioning/playbooks/setup_user.yaml
+- import_playbook: provisioning/playbooks/setup_postgres.yaml
+- import_playbook: provisioning/playbooks/setup_python.yaml
+- import_playbook: provisioning/playbooks/setup_node.yaml
+- import_playbook: provisioning/playbooks/setup_wkhtmltopdf.yaml
+- import_playbook: provisioning/playbooks/setup_nginx.yaml
+- import_playbook: provisioning/playbooks/setup_odoo.yaml

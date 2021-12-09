@@ -5,9 +5,9 @@
   vars:
     ansible_python_interpreter: /usr/bin/python3
     pg_auth:
-      user: vagrant
-      password: vagrant
-    postgresql_version: 10
+      user: odoo
+      password: odoo
+    postgresql_version: 12
   tasks:
     - name: Install postgresql-contrib
       apt: 
@@ -27,10 +27,11 @@
     - name: Add postgres user
       become: yes
       become_user: postgres
+      become_method: sudo
       postgresql_user:
         name: "{{ pg_auth['user'] }}"
         password: "{{ pg_auth['password'] }}"
-        role_attr_flags: "CREATEDB,SUPERUSER"
+        # role_attr_flags: "CREATEDB,SUPERUSER"
 
     - name: Set listen_addresses
       lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf

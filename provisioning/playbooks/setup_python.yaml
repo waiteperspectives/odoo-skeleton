@@ -1,0 +1,91 @@
+---
+- hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    odoo_user: odoo
+    odoo_dependencies:
+      - python3
+      - python3-pip
+      - python3-virtualenv
+      - wget
+      - git
+      - unzip
+      - libpq-dev
+      - libldap2-dev
+      - libsasl2-dev
+      - libxml2-dev
+      - libevent-dev
+      - libxslt1-dev
+      - libjpeg-dev
+      - zlib1g-dev
+      - make
+      - build-essential
+      - libssl-dev
+      - libbz2-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - llvm
+      - libncurses5-dev
+      - xz-utils
+      - tk-dev
+      - libffi-dev
+      - liblzma-dev
+      - python-openssl
+  become: yes
+  become_user: "{{ odoo_user }}"
+
+  tasks:
+    - name: Update Server
+      become: yes
+      become_user: root
+      apt:
+        update_cache: yes
+
+    - name: Install System Dependencies
+      become: yes
+      become_user: root
+      apt:
+        name: "{{ odoo_dependencies }}"
+
+    - name: Check for .pyenv
+      stat:
+        path: "/home/{{ odoo_user }}/.pyenv"
+      register: pyenv_root
+
+    - name: Install pyenv
+      shell: 
+        cmd: curl https://pyenv.run | bash
+        executable: /bin/bash
+        warn: false
+      when: pyenv_root.stat.exists == False
+
+    - name: Check for pyenv pyright
+      stat:
+        path: "/home/{{ odoo_user }}/.pyenv/plugins/pyenv-pyright"
+      register: pyenv_pyright_root
+
+    - name: Install pyenv pyright
+      shell:
+        cmd: "git clone https://github.com/alefpereira/pyenv-pyright.git /home/{{ odoo_user }}/.pyenv/plugins/pyenv-pyright"
+        executable: /bin/bash
+        warn: false
+      when: pyenv_pyright_root.stat.exists == False
+
+    - name: Copy pyenv_init
+      copy:
+        src: ../templates/pyenv_init.txt
+        dest: "/home/{{ odoo_user }}/.pyenv/pyenv_init.txt"
+        owner: "{{ odoo_user }}"
+        group: "{{ odoo_user }}"
+
+    - name: Add pyenv_init to bashrc
+      lineinfile: dest="/home/{{ odoo_user }}/.bashrc"
+        regexp="source /home/{{ odoo_user }}/.pyenv/pyenv_init.txt"
+        line="source /home/{{ odoo_user }}/.pyenv/pyenv_init.txt"
+        state=present
+
+    - name: Add prompt manager to bashrc
+      lineinfile: dest="/home/{{ odoo_user }}/.bashrc"
+        regexp="export PS1='($(pyenv version-name)) '$PS1"
+        line="export PS1='($(pyenv version-name)) '$PS1"
+        state=present

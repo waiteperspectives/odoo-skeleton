@@ -2,10 +2,12 @@
 - hosts: all
   vars:
     ansible_python_interpreter: /usr/bin/python3
+  become: yes
+  become_user: odoo
   tasks:
     - name: Run nvm installer
       script: ../scripts/install_nvm.sh
-    - name: install latest node as vagrant
+    - name: install latest node as odoo
       shell: source ~/.nvm/nvm.sh && nvm install node
       args:
         executable: /bin/bash

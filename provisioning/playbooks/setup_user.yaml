@@ -1,0 +1,22 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: Install ACL
+      apt:
+        name: acl
+        state: present
+    - name: Ensure odoo group
+      ansible.builtin.group:
+        name: odoo
+        state: present
+    - name: Ensure odoo user
+      ansible.builtin.user:
+        name: odoo
+        shell: /bin/bash
+        groups: odoo
+        state: present

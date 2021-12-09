@@ -1,0 +1,17 @@
+[Unit]
+Description=odoo8069
+Requires=postgresql.service
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+SyslogIdentifier=odoo8069
+PermissionsStartOnly=true
+User={{ odoo_user }}
+Group={{ odoo_user }}
+ExecStart=/home/{{ odoo_user }}/.pyenv/versions/odoo/bin/python3 /home/{{ odoo_user }}/odoo/odoo-bin -d {{ odoo_db }} -c /home/{{ odoo_user }}/config/odoo.conf 
+StandardOutput=journal+console
+
+[Install]
+WantedBy=multi-user.target
+
